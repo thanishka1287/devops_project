@@ -1,0 +1,34 @@
+# ==========================================================
+# Docker Compose: Online Bookstore Application
+# Orchestrates containerized Flask web application with
+# persistent volume storage for SQLite database.
+# ==========================================================
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bookstore_app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_PATH=/app/data/bookstore.db
+      - SECRET_KEY=college-devops-bookstore-secret-2026
+      - PORT=5000
+    volumes:
+      # Persistent named volume mapping to preserve SQLite data across container lifecycles
+      - bookstore-data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  # Named volume for persistent database storage
+  bookstore-data:
+    driver: local

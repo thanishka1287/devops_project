@@ -1,0 +1,54 @@
+name: DevOps Bookstore CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Run Pytest Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11 Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Project Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute Automated Unit & Integration Tests
+        run: |
+          pytest -v tests --junitxml=pytest-results.xml
+
+  docker-build:
+    name: Build & Validate Docker Container Image
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t devops-bookstore:latest .
+
+      - name: Test Container Run & Health Endpoint
+        run: |
+          docker run -d --name bookstore-ci -p 5000:5000 devops-bookstore:latest
+          sleep 8
+          curl --fail http://localhost:5000/health || exit 1
+          docker stop bookstore-ci

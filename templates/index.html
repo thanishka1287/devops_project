@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}DevOps Bookshelf | Browse Tech & DevOps Books{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-container">
+        <div class="hero-content">
+            <span class="hero-badge">🚀 Continuous Delivery & Containerized Architecture</span>
+            <h1 class="hero-title">Welcome to <span class="gradient-text">DevOps Bookshelf</span></h1>
+            <p class="hero-subtitle">
+                Explore our curated library of software engineering, cloud computing, continuous integration, and systems design classics.
+            </p>
+            <div class="hero-meta">
+                <div class="hero-stat">
+                    <span class="stat-number">{{ books|length }}</span>
+                    <span class="stat-desc">Books Available</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-number">{{ categories|length }}</span>
+                    <span class="stat-desc">Topic Categories</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-desc">Dockerized</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Store Section -->
+<section class="catalog-section">
+    <div class="catalog-container">
+
+        <!-- Filter & Search Toolbar -->
+        <div class="catalog-toolbar">
+            <div class="category-filters">
+                <a href="{{ url_for('index', q=query) }}" 
+                   class="filter-pill {% if not selected_category or selected_category == 'All' %}active{% endif %}">
+                    All Categories
+                </a>
+                {% for cat in categories %}
+                    <a href="{{ url_for('index', category=cat, q=query) }}" 
+                       class="filter-pill {% if selected_category == cat %}active{% endif %}">
+                        {{ cat }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Active Filter Indicator -->
+        {% if query or (selected_category and selected_category != 'All') %}
+            <div class="active-filter-bar">
+                <span>
+                    Showing results for: 
+                    {% if query %}<strong>"{{ query }}"</strong>{% endif %}
+                    {% if query and selected_category and selected_category != 'All' %} in {% endif %}
+                    {% if selected_category and selected_category != 'All' %}<strong>{{ selected_category }}</strong>{% endif %}
+                </span>
+                <a href="{{ url_for('index') }}" class="clear-filter-btn">&times; Clear Filters</a>
+            </div>
+        {% endif %}
+
+        <!-- Book Cards Grid -->
+        {% if books %}
+            <div class="books-grid">
+                {% for book in books %}
+                    <article class="book-card">
+                        <!-- Stylized Dynamic Book Cover -->
+                        <div class="book-cover-wrapper" style="background: linear-gradient(135deg, {{ book.cover_color }} 0%, #090d16 100%); border-top: 4px solid {{ book.cover_accent }};">
+                            <div class="cover-pattern"></div>
+                            <span class="cover-tag">{{ book.category }}</span>
+                            <div class="cover-body">
+                                <h3 class="cover-title">{{ book.title }}</h3>
+                                <p class="cover-author">by {{ book.author }}</p>
+                            </div>
+                            <div class="cover-spine" style="background-color: {{ book.cover_accent }};"></div>
+                        </div>
+
+                        <!-- Book Content Info -->
+                        <div class="book-info">
+                            <div class="book-header">
+                                <span class="book-category">{{ book.category }}</span>
+                                <span class="book-stock-tag">
+                                    <span class="dot-in-stock"></span> {{ book.stock }} in stock
+                                </span>
+                            </div>
+                            
+                            <h2 class="book-title">
+                                <a href="{{ url_for('book_detail', book_id=book.id) }}">{{ book.title }}</a>
+                            </h2>
+                            <p class="book-author">by {{ book.author }}</p>
+                            
+                            <p class="book-desc">
+                                {{ book.description[:110] }}{% if book.description|length > 110 %}...{% endif %}
+                            </p>
+
+                            <div class="book-footer">
+                                <div class="book-price-box">
+                                    <span class="price-currency">$</span>
+                                    <span class="price-amount">{{ "%.2f"|format(book.price) }}</span>
+                                </div>
+
+                                <div class="book-actions">
+                                    <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-outline" title="View Details">
+                                        Details
+                                    </a>
+                                    <form action="{{ url_for('add_to_cart') }}" method="POST" class="add-cart-form">
+                                        <input type="hidden" name="book_id" value="{{ book.id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <input type="hidden" name="next" value="{{ request.full_path }}">
+                                        <button type="submit" class="btn btn-primary add-btn">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            </svg>
+                                            <span>Add</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty Search State -->
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <h3>No books found</h3>
+                <p>We couldn't find any books matching your criteria{% if query %} for "<strong>{{ query }}</strong>"{% endif %}.</p>
+                <div class="empty-actions">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">Browse All Books</a>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

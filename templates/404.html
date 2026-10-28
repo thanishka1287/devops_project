@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found (404) | DevOps Bookshelf{% endblock %}
+
+{% block content %}
+<div class="empty-state">
+    <div class="empty-icon">🧭</div>
+    <h2>404 - Page or Resource Not Found</h2>
+    <p>The page or book you requested does not exist or has been relocated.</p>
+    <div class="empty-actions">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Return to Catalog</a>
+    </div>
+</div>
+{% endblock %}

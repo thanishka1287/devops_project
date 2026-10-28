@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart | DevOps Bookshelf{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <div class="page-header">
+        <h1 class="page-title">Your Shopping Cart</h1>
+        <p class="page-subtitle">Review your selected titles before continuing to checkout.</p>
+    </div>
+
+    {% if cart_items %}
+        <div class="cart-layout">
+            <!-- Cart Items Table -->
+            <div class="cart-table-wrapper">
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th class="th-book">Book</th>
+                            <th class="th-price">Price</th>
+                            <th class="th-qty">Quantity</th>
+                            <th class="th-total">Total</th>
+                            <th class="th-action">Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                            <tr class="cart-row">
+                                <td class="td-book">
+                                    <div class="cart-book-meta">
+                                        <div class="cart-mini-cover" style="background: linear-gradient(135deg, {{ item.cover_color }} 0%, #0f172a 100%); border-left: 3px solid {{ item.cover_accent }};">
+                                            <span>📖</span>
+                                        </div>
+                                        <div>
+                                            <a href="{{ url_for('book_detail', book_id=item.book_id) }}" class="cart-book-title">
+                                                {{ item.title }}
+                                            </a>
+                                            <span class="cart-book-author">by {{ item.author }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="td-price">${{ "%.2f"|format(item.price) }}</td>
+                                <td class="td-qty">
+                                    <div class="qty-control-group">
+                                        <form action="{{ url_for('update_cart') }}" method="POST" class="inline-form">
+                                            <input type="hidden" name="book_id" value="{{ item.book_id }}">
+                                            <input type="hidden" name="action" value="decrease">
+                                            <button type="submit" class="qty-btn" title="Decrease Quantity">&minus;</button>
+                                        </form>
+                                        <span class="qty-display">{{ item.quantity }}</span>
+                                        <form action="{{ url_for('update_cart') }}" method="POST" class="inline-form">
+                                            <input type="hidden" name="book_id" value="{{ item.book_id }}">
+                                            <input type="hidden" name="action" value="increase">
+                                            <button type="submit" class="qty-btn" title="Increase Quantity">&plus;</button>
+                                        </form>
+                                    </div>
+                                </td>
+                                <td class="td-total">${{ "%.2f"|format(item.subtotal) }}</td>
+                                <td class="td-action">
+                                    <form action="{{ url_for('update_cart') }}" method="POST" class="inline-form">
+                                        <input type="hidden" name="book_id" value="{{ item.book_id }}">
+                                        <input type="hidden" name="action" value="remove">
+                                        <button type="submit" class="remove-btn" title="Remove item from cart">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="cart-table-footer">
+                    <form action="{{ url_for('clear_cart') }}" method="POST" onsubmit="return confirm('Are you sure you want to empty your entire cart?');">
+                        <button type="submit" class="btn btn-outline-danger">Clear Cart</button>
+                    </form>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline">&larr; Continue Shopping</a>
+                </div>
+            </div>
+
+            <!-- Order Summary Card -->
+            <div class="cart-summary-card">
+                <h3 class="summary-title">Order Summary</h3>
+                <div class="summary-line">
+                    <span>Items Subtotal</span>
+                    <span class="summary-val">${{ "%.2f"|format(subtotal) }}</span>
+                </div>
+                <div class="summary-line">
+                    <span>Shipping</span>
+                    <span class="summary-val text-success">FREE (Demo)</span>
+                </div>
+                <div class="summary-line">
+                    <span>Estimated Tax</span>
+                    <span class="summary-val">$0.00</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-total-line">
+                    <span>Total Amount</span>
+                    <span class="summary-total-val">${{ "%.2f"|format(subtotal) }}</span>
+                </div>
+
+                <div class="summary-actions">
+                    <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-block btn-checkout">
+                        Proceed to Checkout &rarr;
+                    </a>
+                </div>
+
+                <div class="summary-notice">
+                    <span class="notice-icon">ℹ️</span>
+                    <p>College DevOps Demonstration Project. Orders are persisted in SQLite, no payment information is collected.</p>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty Cart Display -->
+        <div class="empty-state">
+            <div class="empty-icon">🛒</div>
+            <h2>Your Cart is Empty</h2>
+            <p>You haven't added any books to your cart yet. Explore our curated selection of engineering titles!</p>
+            <div class="empty-actions">
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-large">Browse Catalog Now</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

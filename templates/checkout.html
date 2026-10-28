@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | DevOps Bookshelf{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="page-header">
+        <h1 class="page-title">Checkout & Shipping</h1>
+        <p class="page-subtitle">Provide your delivery information to complete your order.</p>
+    </div>
+
+    <div class="checkout-layout">
+        <!-- Customer Details Form -->
+        <div class="checkout-form-card">
+            <h2 class="form-section-title">Shipping Information</h2>
+
+            <div class="demo-banner">
+                <span class="banner-icon">🎓</span>
+                <p><strong>DevOps Academic Demonstration:</strong> Real payment gateways and sensitive credit card fields are intentionally omitted. This order will be recorded directly into the containerized SQLite database volume.</p>
+            </div>
+
+            <form action="{{ url_for('checkout') }}" method="POST" class="order-form">
+                <div class="form-group">
+                    <label for="customer_name" class="form-label">Full Name <span class="required">*</span></label>
+                    <input 
+                        type="text" 
+                        id="customer_name" 
+                        name="customer_name" 
+                        value="{{ customer_name|default('') }}" 
+                        placeholder="e.g. Alex Morgan" 
+                        class="form-control"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="customer_email" class="form-label">Email Address <span class="required">*</span></label>
+                    <input 
+                        type="email" 
+                        id="customer_email" 
+                        name="customer_email" 
+                        value="{{ customer_email|default('') }}" 
+                        placeholder="e.g. alex@university.edu" 
+                        class="form-control"
+                        required
+                    >
+                    <span class="form-hint">Order confirmation details will be associated with this email.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="customer_address" class="form-label">Shipping / Campus Address <span class="required">*</span></label>
+                    <textarea 
+                        id="customer_address" 
+                        name="customer_address" 
+                        rows="3" 
+                        placeholder="e.g. 100 University Drive, Tech Hall Rm 402, Cambridge, MA" 
+                        class="form-control"
+                        required
+                    >{{ customer_address|default('') }}</textarea>
+                </div>
+
+                <div class="checkout-actions">
+                    <button type="submit" class="btn btn-primary btn-large btn-block">
+                        Place Order (${{ "%.2f"|format(subtotal) }}) &rarr;
+                    </button>
+                    <a href="{{ url_for('view_cart') }}" class="btn btn-outline btn-block text-center">
+                        &larr; Return to Cart
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Order Summary Side Panel -->
+        <div class="checkout-summary-card">
+            <h3 class="summary-title">Order Overview</h3>
+            <div class="checkout-items-list">
+                {% for item in cart_items %}
+                    <div class="checkout-item-row">
+                        <div class="checkout-item-info">
+                            <span class="checkout-item-title">{{ item.title }}</span>
+                            <span class="checkout-item-qty">Qty: {{ item.quantity }} &times; ${{ "%.2f"|format(item.price) }}</span>
+                        </div>
+                        <span class="checkout-item-total">
+                            ${{ "%.2f"|format(item.price * item.quantity) }}
+                        </span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-line">
+                <span>Items Subtotal</span>
+                <span class="summary-val">${{ "%.2f"|format(subtotal) }}</span>
+            </div>
+            <div class="summary-line">
+                <span>Shipping</span>
+                <span class="summary-val text-success">FREE</span>
+            </div>
+            <div class="summary-total-line">
+                <span>Total Due</span>
+                <span class="summary-total-val text-gradient">${{ "%.2f"|format(subtotal) }}</span>
+            </div>
+
+            <div class="tech-spec-box mt-4">
+                <h4>Persistence Lifecycle</h4>
+                <p class="text-muted small">
+                    When you click "Place Order", Flask inserts records into <code>orders</code> and <code>order_items</code>. Because Docker mounts the volume <code>bookstore-data</code>, this order persists even if the container is restarted or updated.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

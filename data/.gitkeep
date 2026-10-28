@@ -1,0 +1,2 @@
+# This directory holds persistent SQLite databases mounted via Docker volumes.
+# SQLite database files are excluded by .gitignore and .dockerignore.

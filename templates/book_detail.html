@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} | DevOps Bookshelf{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('index') }}">Catalog</a> &rsaquo;
+        <a href="{{ url_for('index', category=book.category) }}">{{ book.category }}</a> &rsaquo;
+        <span class="active">{{ book.title }}</span>
+    </nav>
+
+    <div class="detail-layout">
+        <!-- Book Cover Preview -->
+        <div class="detail-cover-card">
+            <div class="detail-cover" style="background: linear-gradient(135deg, {{ book.cover_color }} 0%, #0a0e17 100%); border-top: 6px solid {{ book.cover_accent }};">
+                <div class="cover-pattern"></div>
+                <span class="detail-cover-tag">{{ book.category }}</span>
+                <div class="detail-cover-content">
+                    <h2 class="detail-cover-title">{{ book.title }}</h2>
+                    <p class="detail-cover-author">by {{ book.author }}</p>
+                </div>
+                <div class="detail-cover-footer">
+                    <span>ISBN: {{ book.isbn }}</span>
+                </div>
+            </div>
+            
+            <div class="tech-spec-box">
+                <h4>DevOps Metadata</h4>
+                <div class="spec-row">
+                    <span class="spec-label">Database Record</span>
+                    <span class="spec-code">books[id={{ book.id }}]</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Storage Engine</span>
+                    <span class="spec-code">SQLite 3 (WAL mode)</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Volume Mount</span>
+                    <span class="spec-code">/app/data/bookstore.db</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Details & Purchase Form -->
+        <div class="detail-content">
+            <div class="detail-header">
+                <span class="badge badge-category">{{ book.category }}</span>
+                <h1 class="detail-title">{{ book.title }}</h1>
+                <p class="detail-author">Written by <strong>{{ book.author }}</strong></p>
+            </div>
+
+            <div class="detail-price-panel">
+                <div class="price-section">
+                    <span class="price-label">Price</span>
+                    <div class="price-value">
+                        <span class="currency">$</span>{{ "%.2f"|format(book.price) }}
+                    </div>
+                </div>
+                <div class="stock-section">
+                    <span class="stock-status in-stock">
+                        <span class="dot-in-stock"></span> Available In Stock
+                    </span>
+                    <span class="stock-count">{{ book.stock }} units remaining in SQLite storage</span>
+                </div>
+            </div>
+
+            <div class="detail-description">
+                <h3>About This Book</h3>
+                <p>{{ book.description }}</p>
+            </div>
+
+            <!-- Add to Cart Form -->
+            <div class="detail-order-box">
+                <form action="{{ url_for('add_to_cart') }}" method="POST" class="detail-cart-form">
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <div class="quantity-selector">
+                        <label for="quantity">Quantity:</label>
+                        <select name="quantity" id="quantity" class="form-select quantity-select">
+                            {% for i in range(1, 6) %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-large">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        Add to Shopping Cart
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Catalog</a>
+                </form>
+            </div>
+
+            <div class="guarantee-box">
+                <div class="guarantee-item">
+                    <span class="guarantee-icon">⚡</span>
+                    <div>
+                        <strong>Instant Containerized Processing</strong>
+                        <p>Flask session-backed shopping cart with no third-party tracking.</p>
+                    </div>
+                </div>
+                <div class="guarantee-item">
+                    <span class="guarantee-icon">🛡️</span>
+                    <div>
+                        <strong>Persistent Orders</strong>
+                        <p>Orders are written securely into the mounted SQLite volume.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

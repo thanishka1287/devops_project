@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error (500) | DevOps Bookshelf{% endblock %}
+
+{% block content %}
+<div class="empty-state">
+    <div class="empty-icon">⚠️</div>
+    <h2>500 - Internal Server Error</h2>
+    <p>Something went wrong on the server. Inspect the Docker container logs with <code>docker compose logs -f</code> to view trace details.</p>
+    <div class="empty-actions">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Return to Catalog</a>
+    </div>
+</div>
+{% endblock %}

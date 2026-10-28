@@ -1,0 +1,32 @@
+# Git & VCS
+.git
+.gitignore
+
+# Python cache & virtual environments
+__pycache__
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+
+# Testing & linting caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases (database will be initialized inside named volume)
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# CI/CD & Local logs
+.github/
+*.log
